@@ -57,6 +57,16 @@
               </el-radio-group>
             </el-form-item>
             <el-form-item
+              v-if="configForm.candidateStrategy === CandidateStrategy.HEADLESS_REMOTE"
+              label="Portal 候选人规则"
+              prop="portalRule"
+            >
+              <el-input
+                v-model="configForm.portalRule"
+                placeholder="例如：部门负责人、业务角色编码或 Portal 规则编码"
+              />
+            </el-form-item>
+            <el-form-item
               v-if="configForm.candidateStrategy == CandidateStrategy.ROLE"
               label="指定角色"
               prop="roleIds"
@@ -665,6 +675,7 @@ const changeCandidateStrategy = () => {
   configForm.value.roleIds = []
   configForm.value.postIds = []
   configForm.value.userGroups = []
+  configForm.value.portalRule = ''
   configForm.value.deptLevel = 1
   configForm.value.formUser = ''
   configForm.value.formDept = ''

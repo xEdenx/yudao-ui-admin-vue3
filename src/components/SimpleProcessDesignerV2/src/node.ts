@@ -143,6 +143,7 @@ export type UserTaskFormType = {
   userIds?: number[] // 用户
   userGroups?: number[] // 用户组
   postIds?: number[] // 岗位
+  portalRule?: string // Portal 远程候选人规则
   expression?: string // 流程表达式
   formUser?: string // 表单内用户字段
   formDept?: string // 表单内部门字段
@@ -188,6 +189,7 @@ export type CopyTaskFormType = {
   userIds?: number[] // 用户
   userGroups?: number[] // 用户组
   postIds?: number[] // 岗位
+  portalRule?: string // Portal 远程候选人规则
   formUser?: string // 表单内用户字段
   formDept?: string // 表单内部门字段
   expression?: string // 流程表达式
@@ -207,7 +209,7 @@ export function useNodeForm(nodeType: NodeType) {
   const configForm = ref<UserTaskFormType | CopyTaskFormType>()
   if (nodeType === NodeType.USER_TASK_NODE || nodeType === NodeType.TRANSACTOR_NODE) {
     configForm.value = {
-      candidateStrategy: CandidateStrategy.USER,
+      candidateStrategy: CandidateStrategy.START_USER_SELECT,
       approveMethod: ApproveMethodType.SEQUENTIAL_APPROVE,
       approveRatio: 100,
       rejectHandlerType: RejectHandlerType.FINISH_PROCESS,
@@ -221,7 +223,7 @@ export function useNodeForm(nodeType: NodeType) {
     }
   } else {
     configForm.value = {
-      candidateStrategy: CandidateStrategy.USER
+      candidateStrategy: CandidateStrategy.START_USER_SELECT
     }
   }
 
@@ -320,6 +322,9 @@ export function useNodeForm(nodeType: NodeType) {
     if (configForm.value?.candidateStrategy === CandidateStrategy.START_USER_SELECT) {
       showText = `发起人自选`
     }
+    if (configForm.value?.candidateStrategy === CandidateStrategy.HEADLESS_REMOTE) {
+      showText = `Portal 远程候选人：${configForm.value.portalRule || '由 Portal 默认规则解算'}`
+    }
     // 发起人自己
     if (configForm.value?.candidateStrategy === CandidateStrategy.START_USER) {
       showText = `发起人自己`
@@ -391,6 +396,9 @@ export function useNodeForm(nodeType: NodeType) {
         candidateParam = deptFieldOnForm.concat('|' + configForm.value.deptLevel + '')
         break
       }
+      case CandidateStrategy.HEADLESS_REMOTE:
+        candidateParam = configForm.value.portalRule
+        break
       default:
         break
     }
@@ -451,6 +459,9 @@ export function useNodeForm(nodeType: NodeType) {
         configForm.value.deptLevel = +paramArray[1]
         break
       }
+      case CandidateStrategy.HEADLESS_REMOTE:
+        configForm.value.portalRule = candidateParam
+        break
       default:
         break
     }

@@ -185,6 +185,10 @@ export enum CandidateStrategy {
    */
   START_USER_MULTI_LEVEL_DEPT_LEADER = 38,
   /**
+   * 由 Portal 在节点到达时远程解算候选人
+   */
+  HEADLESS_REMOTE = 70,
+  /**
    * 指定用户组
    */
   USER_GROUP = 40,
@@ -540,21 +544,8 @@ NODE_DEFAULT_NAME.set(NodeType.CHILD_PROCESS_NODE, '子流程')
 
 // 候选人策略。暂时不从字典中取。 后续可能调整。控制显示顺序
 export const CANDIDATE_STRATEGY: DictDataVO[] = [
-  { label: '指定成员', value: CandidateStrategy.USER },
-  { label: '指定角色', value: CandidateStrategy.ROLE },
-  { label: '指定岗位', value: CandidateStrategy.POST },
-  { label: '部门成员', value: CandidateStrategy.DEPT_MEMBER },
-  { label: '部门负责人', value: CandidateStrategy.DEPT_LEADER },
-  { label: '连续多级部门负责人', value: CandidateStrategy.MULTI_LEVEL_DEPT_LEADER },
   { label: '发起人自选', value: CandidateStrategy.START_USER_SELECT },
-  { label: '审批人自选', value: CandidateStrategy.APPROVE_USER_SELECT },
-  { label: '发起人本人', value: CandidateStrategy.START_USER },
-  { label: '发起人部门负责人', value: CandidateStrategy.START_USER_DEPT_LEADER },
-  { label: '发起人连续部门负责人', value: CandidateStrategy.START_USER_MULTI_LEVEL_DEPT_LEADER },
-  { label: '用户组', value: CandidateStrategy.USER_GROUP },
-  { label: '表单内用户字段', value: CandidateStrategy.FORM_USER },
-  { label: '表单内部门负责人', value: CandidateStrategy.FORM_DEPT_LEADER },
-  { label: '流程表达式', value: CandidateStrategy.EXPRESSION }
+  { label: 'Portal 远程候选人', value: CandidateStrategy.HEADLESS_REMOTE }
 ]
 // 审批节点 的审批类型
 export const APPROVE_TYPE: DictDataVO[] = [

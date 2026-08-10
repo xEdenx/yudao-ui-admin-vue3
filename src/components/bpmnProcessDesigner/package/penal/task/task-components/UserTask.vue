@@ -16,6 +16,17 @@
       </el-select>
     </el-form-item>
     <el-form-item
+      v-if="userTaskForm.candidateStrategy === CandidateStrategy.HEADLESS_REMOTE"
+      label="Portal 候选人规则"
+      prop="candidateParam"
+    >
+      <el-input
+        v-model="portalCandidateParam"
+        placeholder="例如：部门负责人、业务角色编码或 Portal 规则编码"
+        @change="updateElementTask"
+      />
+    </el-form-item>
+    <el-form-item
       v-if="userTaskForm.candidateStrategy == CandidateStrategy.ROLE"
       label="指定角色"
       prop="candidateParam"
@@ -217,9 +228,8 @@ import {
   FieldPermissionType,
   MULTI_LEVEL_DEPT
 } from '@/components/SimpleProcessDesignerV2/src/consts'
-import { defaultProps, handleTree } from '@/utils/tree'
+import { defaultProps } from '@/utils/tree'
 import * as RoleApi from '@/api/system/role'
-import * as DeptApi from '@/api/system/dept'
 import * as PostApi from '@/api/system/post'
 import * as UserApi from '@/api/system/user'
 import * as UserGroupApi from '@/api/bpm/userGroup'
@@ -243,6 +253,15 @@ const userTaskForm = ref<UserTaskForm>({
   candidateStrategy: undefined, // 分配规则
   candidateParam: [], // 分配选项
   skipExpression: '' // 跳过表达式
+})
+const portalCandidateParam = computed({
+  get: () => {
+    const value = userTaskForm.value.candidateParam
+    return value instanceof Array ? '' : String(value ?? '')
+  },
+  set: (value: string) => {
+    userTaskForm.value.candidateParam = value
+  }
 })
 const bpmnElement = ref()
 const bpmnInstances = () => (window as any)?.bpmnInstances
@@ -453,20 +472,6 @@ watch(
   },
   { immediate: true }
 )
-
-onMounted(async () => {
-  // 获得角色列表
-  roleOptions.value = await RoleApi.getSimpleRoleList()
-  // 获得部门列表
-  const deptOptions = await DeptApi.getSimpleDeptList()
-  deptTreeOptions.value = handleTree(deptOptions, 'id')
-  // 获得岗位列表
-  postOptions.value = await PostApi.getSimplePostList()
-  // 获得用户列表
-  userOptions.value = await UserApi.getSimpleUserList()
-  // 获得用户组列表
-  userGroupOptions.value = await UserGroupApi.getUserGroupSimpleList()
-})
 
 onBeforeUnmount(() => {
   bpmnElement.value = null
