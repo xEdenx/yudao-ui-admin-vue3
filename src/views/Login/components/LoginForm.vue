@@ -103,6 +103,13 @@
           </el-row>
         </el-form-item>
       </el-col>
+      <el-col v-if="isHeadlessBpmLoginAvailable" :span="24" class="px-10px">
+        <el-form-item>
+          <el-button class="w-full" @click="setLoginState(LoginStateEnum.HEADLESS_BPM)">
+            Headless BPM 本地登录
+          </el-button>
+        </el-form-item>
+      </el-col>
       <el-divider content-position="center">{{ t('login.otherLogin') }}</el-divider>
       <el-col :span="24" class="px-10px">
         <el-form-item>
@@ -167,6 +174,8 @@ const verify = ref()
 const captchaType = ref('blockPuzzle') // blockPuzzle 滑块 clickWord 点击文字 pictureWord 文字验证码
 
 const getShow = computed(() => unref(getLoginState) === LoginStateEnum.LOGIN)
+const isHeadlessBpmLoginAvailable =
+  import.meta.env.DEV || import.meta.env.VITE_APP_HEADLESS_BPM_LOGIN === 'true'
 
 const LoginRules = {
   tenantName: [required],

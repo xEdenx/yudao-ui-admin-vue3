@@ -21,6 +21,8 @@ export const getRefreshToken = () => {
 
 // 设置token
 export const setToken = (token: TokenType) => {
+  // 新 token 默认属于 system 登录；Headless BPM 登录会在其后显式标记。
+  wsCache.delete(CACHE_KEY.HeadlessBpmLogin)
   wsCache.set(RefreshTokenKey, token.refreshToken)
   wsCache.set(AccessTokenKey, token.accessToken)
 }
@@ -29,7 +31,14 @@ export const setToken = (token: TokenType) => {
 export const removeToken = () => {
   wsCache.delete(AccessTokenKey)
   wsCache.delete(RefreshTokenKey)
+  wsCache.delete(CACHE_KEY.HeadlessBpmLogin)
 }
+
+/** 当前 token 是否由本地 Headless BPM Mock 登录页获取。 */
+export const isHeadlessBpmLogin = () => wsCache.get(CACHE_KEY.HeadlessBpmLogin) === true
+
+/** 仅供本地 Headless BPM 登录成功后调用。 */
+export const setHeadlessBpmLogin = () => wsCache.set(CACHE_KEY.HeadlessBpmLogin, true)
 
 /** 格式化token（jwt格式） */
 export const formatToken = (token: string): string => {

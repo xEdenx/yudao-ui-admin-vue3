@@ -208,7 +208,11 @@ const getList = async () => {
   }
 }
 
-/** 初始化 **/
+/** 首次进入页面时加载数据；从其他标签页返回时再刷新一次。 */
+onMounted(() => {
+  getList()
+})
+
 onActivated(() => {
   getList()
 })

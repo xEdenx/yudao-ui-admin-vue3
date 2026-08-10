@@ -19,6 +19,7 @@ export const CACHE_KEY = {
   DICT_CACHE: 'dictCache',
   // 登录表单
   LoginForm: 'loginForm',
+  HeadlessBpmLogin: 'headlessBpmLogin',
   TenantId: 'tenantId'
 }
 

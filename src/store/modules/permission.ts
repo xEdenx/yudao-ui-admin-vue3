@@ -4,6 +4,8 @@ import { cloneDeep } from 'lodash-es'
 import remainingRouter from '@/router/modules/remaining'
 import { flatMultiLevelRoutes, generateRoute } from '@/utils/routerHelper'
 import { CACHE_KEY, useCache } from '@/hooks/web/useCache'
+import { isHeadlessBpmLogin } from '@/utils/auth'
+import { getHeadlessBpmMenus } from '@/router/modules/headlessBpm'
 
 const { wsCache } = useCache()
 
@@ -38,11 +40,18 @@ export const usePermissionStore = defineStore('permission', {
   actions: {
     async generateRoutes(): Promise<unknown> {
       return new Promise<void>(async (resolve) => {
-        // 获得菜单列表，它在登录的时候，setUserInfoAction 方法中已经进行获取
+        // Headless 登录复用原 BPM 菜单组，但不再请求 system_menu。
+        const isHeadless = isHeadlessBpmLogin()
         let res: AppCustomRouteRecordRaw[] = []
-        const roleRouters = wsCache.get(CACHE_KEY.ROLE_ROUTERS)
-        if (roleRouters) {
-          res = roleRouters as AppCustomRouteRecordRaw[]
+        if (isHeadless) {
+          const roles = (wsCache.get(CACHE_KEY.USER)?.roles || []) as string[]
+          res = getHeadlessBpmMenus(roles)
+        } else {
+          // 获得菜单列表，它在登录的时候，setUserInfoAction 方法中已经进行获取
+          const roleRouters = wsCache.get(CACHE_KEY.ROLE_ROUTERS)
+          if (roleRouters) {
+            res = roleRouters as AppCustomRouteRecordRaw[]
+          }
         }
         const routerMap: AppRouteRecordRaw[] = generateRoute(res)
         // 动态路由，404一定要放到最后面
@@ -60,7 +69,7 @@ export const usePermissionStore = defineStore('permission', {
           }
         ])
         // 渲染菜单的所有路由
-        this.routers = cloneDeep(remainingRouter).concat(routerMap)
+        this.routers = isHeadless ? routerMap : cloneDeep(remainingRouter).concat(routerMap)
         resolve()
       })
     },

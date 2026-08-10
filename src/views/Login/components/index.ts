@@ -5,6 +5,7 @@ import RegisterForm from './RegisterForm.vue'
 import QrCodeForm from './QrCodeForm.vue'
 import SSOLoginVue from './SSOLogin.vue'
 import ForgetPasswordForm from './ForgetPasswordForm.vue'
+import HeadlessBpmLoginForm from './HeadlessBpmLoginForm.vue'
 
 export {
   LoginForm,
@@ -13,5 +14,6 @@ export {
   RegisterForm,
   QrCodeForm,
   SSOLoginVue,
-  ForgetPasswordForm
+  ForgetPasswordForm,
+  HeadlessBpmLoginForm
 }

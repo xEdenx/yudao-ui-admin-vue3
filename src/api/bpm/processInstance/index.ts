@@ -6,6 +6,10 @@ export type Task = {
   name: string
 }
 
+// 过渡期兼容本地管理端的数值 ID 与 Portal 的原始 String ID。
+// 新的 Portal 调用方应始终传递 String ID；BPM 不再要求它可转换为数字。
+export type BpmUserId = string | number
+
 export type ProcessInstanceVO = {
   id: number
   name: string
@@ -24,9 +28,11 @@ export type ProcessInstanceVO = {
 
 // 用户信息
 export type User = {
-  id: number
+  id: BpmUserId
   nickname: string
   avatar: string
+  deptId?: BpmUserId
+  deptName?: string
 }
 
 // 审批任务信息
@@ -66,7 +72,7 @@ export const createProcessInstance = async (data) => {
   return await request.post({ url: '/bpm/process-instance/create', data: data })
 }
 
-export const cancelProcessInstanceByStartUser = async (id: number, reason: string) => {
+export const cancelProcessInstanceByStartUser = async (id: string | number, reason: string) => {
   const data = {
     id: id,
     reason: reason
@@ -74,7 +80,7 @@ export const cancelProcessInstanceByStartUser = async (id: number, reason: strin
   return await request.delete({ url: '/bpm/process-instance/cancel-by-start-user', data: data })
 }
 
-export const cancelProcessInstanceByAdmin = async (id: number, reason: string) => {
+export const cancelProcessInstanceByAdmin = async (id: string | number, reason: string) => {
   const data = {
     id: id,
     reason: reason

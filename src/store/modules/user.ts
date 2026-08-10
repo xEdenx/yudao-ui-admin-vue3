@@ -1,10 +1,18 @@
 import { store } from '@/store'
 import { defineStore } from 'pinia'
-import { getAccessToken, removeToken } from '@/utils/auth'
+import { getAccessToken, isHeadlessBpmLogin, removeToken } from '@/utils/auth'
 import { CACHE_KEY, useCache, deleteUserCache } from '@/hooks/web/useCache'
 import { getInfo, loginOut } from '@/api/login'
+import * as BpmPortalAuthApi from '@/api/bpm/portalAuth'
 
 const { wsCache } = useCache()
+
+const BPM_MODEL_MANAGER_ROLE = 'ROLE_BPM_MODEL_MANAGER'
+const HEADLESS_BPM_RUN_PERMISSIONS = [
+  'bpm:process-instance:query',
+  'bpm:task:query',
+  'bpm:task:update'
+]
 
 interface UserVO {
   id: number
@@ -54,7 +62,24 @@ export const useUserStore = defineStore('admin-user', {
         return null
       }
       let userInfo = wsCache.get(CACHE_KEY.USER)
-      if (!userInfo) {
+      if (isHeadlessBpmLogin()) {
+        const portalUser = await BpmPortalAuthApi.getCurrentUser()
+        userInfo = {
+          // 与后端本地 Mock 规则一致：模型管理员可以操作完整 BPM 菜单；其他用户仅处理自己的流程任务。
+          permissions: portalUser.roleCodes.includes(BPM_MODEL_MANAGER_ROLE)
+            ? ['*:*:*']
+            : HEADLESS_BPM_RUN_PERMISSIONS,
+          roles: portalUser.roleCodes,
+          user: {
+            // 现有 Admin UI 的全局 UserVO 仍是 number；Portal 原始字符串 ID 只在 BPM Token/API 中传递。
+            id: 0,
+            avatar: portalUser.avatar || '',
+            nickname: portalUser.displayName,
+            deptId: 0
+          },
+          menus: []
+        }
+      } else if (!userInfo) {
         userInfo = await getInfo()
       } else {
         // 特殊：在有缓存的情况下，进行加载。但是即使加载失败，也不影响后续的操作，保证可以进入系统
@@ -84,7 +109,10 @@ export const useUserStore = defineStore('admin-user', {
       wsCache.set(CACHE_KEY.USER, userInfo)
     },
     async loginOut() {
-      await loginOut()
+      // Headless token 不属于 system OAuth2 token；本地登出只清理浏览器状态，不能调用 system 登出接口。
+      if (!isHeadlessBpmLogin()) {
+        await loginOut()
+      }
       removeToken()
       deleteUserCache() // 删除用户缓存
       this.resetState()

@@ -61,6 +61,8 @@
             <SSOLoginVue class="m-auto h-auto p-20px lt-xl:(rounded-3xl light:bg-white)" />
             <!-- 忘记密码 -->
             <ForgetPasswordForm class="m-auto h-auto p-20px lt-xl:(rounded-3xl light:bg-white)" />
+            <!-- 本地 Headless BPM Mock 登录 -->
+            <HeadlessBpmLoginForm class="m-auto h-auto p-20px lt-xl:(rounded-3xl light:bg-white)" />
           </div>
         </Transition>
       </div>
@@ -81,7 +83,8 @@ import {
   QrCodeForm,
   RegisterForm,
   SSOLoginVue,
-  ForgetPasswordForm
+  ForgetPasswordForm,
+  HeadlessBpmLoginForm
 } from './components'
 
 defineOptions({ name: 'Login' })
