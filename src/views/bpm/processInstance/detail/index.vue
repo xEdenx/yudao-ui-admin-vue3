@@ -146,7 +146,7 @@ import { setConfAndFields2 } from '@/utils/formCreate'
 import { registerComponent } from '@/utils/routerHelper'
 import type { Api as FormCreateApi } from '@form-create/element-ui'
 import * as ProcessInstanceApi from '@/api/bpm/processInstance'
-import * as UserApi from '@/api/system/user'
+import { getSimpleUserList, type BpmDirectoryUserVO } from '@/api/bpm/portalDirectory'
 import ProcessInstanceBpmnViewer from './ProcessInstanceBpmnViewer.vue'
 import ProcessInstanceSimpleViewer from './ProcessInstanceSimpleViewer.vue'
 import ProcessInstanceTaskList from './ProcessInstanceTaskList.vue'
@@ -313,11 +313,11 @@ const handlePrint = async () => {
 const activeTab = ref('form')
 
 /** 初始化 */
-const userOptions = ref<UserApi.UserVO[]>([]) // 用户列表
+const userOptions = ref<BpmDirectoryUserVO[]>([]) // 用户列表
 onMounted(async () => {
   getDetail()
   // 获得用户列表
-  userOptions.value = await UserApi.getSimpleUserList()
+  userOptions.value = await getSimpleUserList()
 })
 </script>
 

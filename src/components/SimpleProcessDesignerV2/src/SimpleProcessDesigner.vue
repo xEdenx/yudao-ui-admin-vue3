@@ -28,11 +28,11 @@ import SimpleProcessModel from './SimpleProcessModel.vue'
 import { SimpleFlowNode, NodeType, NodeId, NODE_DEFAULT_TEXT } from './consts'
 import { getForm } from '@/api/bpm/form'
 import { handleTree } from '@/utils/tree'
-import * as RoleApi from '@/api/system/role'
-import * as DeptApi from '@/api/system/dept'
-import * as PostApi from '@/api/system/post'
-import * as UserApi from '@/api/system/user'
-import * as UserGroupApi from '@/api/bpm/userGroup'
+import {
+  getSimpleDirectory,
+  type BpmDirectoryDepartmentVO,
+  type BpmDirectoryUserVO
+} from '@/api/bpm/portalDirectory'
 import { BpmModelFormType } from '@/utils/constants'
 
 defineOptions({
@@ -98,12 +98,12 @@ watch(
   { immediate: true }
 )
 
-const roleOptions = ref<RoleApi.RoleVO[]>([]) // 角色列表
-const postOptions = ref<PostApi.PostVO[]>([]) // 岗位列表
-const userOptions = ref<UserApi.UserVO[]>([]) // 用户列表
-const deptOptions = ref<DeptApi.DeptVO[]>([]) // 部门列表
+const roleOptions = ref<any[]>([]) // 角色列表
+const postOptions = ref<any[]>([]) // 岗位列表
+const userOptions = ref<BpmDirectoryUserVO[]>([]) // 用户列表
+const deptOptions = ref<BpmDirectoryDepartmentVO[]>([]) // 部门列表
 const deptTreeOptions = ref()
-const userGroupOptions = ref<UserGroupApi.UserGroupVO[]>([]) // 用户组列表
+const userGroupOptions = ref<any[]>([]) // 用户组列表
 
 provide('formFields', formFields)
 provide('formType', formType)
@@ -207,17 +207,11 @@ onMounted(async () => {
     //     }
     //   }
     // }
-    // 获得角色列表
-    roleOptions.value = await RoleApi.getSimpleRoleList()
-    // 获得岗位列表
-    postOptions.value = await PostApi.getSimplePostList()
-    // 获得用户列表
-    userOptions.value = await UserApi.getSimpleUserList()
-    // 获得部门列表
-    deptOptions.value = await DeptApi.getSimpleDeptList()
-    deptTreeOptions.value = handleTree(deptOptions.value as DeptApi.DeptVO[], 'id')
-    // 获取用户组列表
-    userGroupOptions.value = await UserGroupApi.getUserGroupSimpleList()
+    // 只加载 Portal 用户和部门目录；角色、岗位、用户组策略已不属于 Headless BPM 的可选策略。
+    const directory = await getSimpleDirectory()
+    userOptions.value = directory.users
+    deptOptions.value = directory.departments
+    deptTreeOptions.value = handleTree(deptOptions.value, 'id')
     // 加载流程数据
     if (processData.value) {
       processNodeTree.value = processData?.value

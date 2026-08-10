@@ -33,7 +33,7 @@
 
 <script lang="ts" setup>
 import { defaultProps, handleTree } from '@/utils/tree'
-import * as DeptApi from '@/api/system/dept'
+import { getSimpleDeptList, type BpmDirectoryDepartmentVO } from '@/api/bpm/portalDirectory'
 
 defineOptions({ name: 'DeptSelectForm' })
 
@@ -59,17 +59,17 @@ const props = defineProps({
 
 const treeRef = ref()
 const deptTree = ref<Tree[]>([]) // 部门树形结构
-const selectedDeptIds = ref<number[]>([]) // 选中的部门 ID 列表
+const selectedDeptIds = ref<Array<string | number>>([]) // 选中的部门 ID 列表
 const dialogVisible = ref(false) // 弹窗的是否展示
 const formLoading = ref(false) // 表单的加载中
 
 /** 打开弹窗 */
-const open = async (selectedList?: DeptApi.DeptVO[]) => {
+const open = async (selectedList?: BpmDirectoryDepartmentVO[]) => {
   resetForm()
   formLoading.value = true
   try {
     // 加载部门列表
-    const deptData = await DeptApi.getSimpleDeptList()
+    const deptData = await getSimpleDeptList()
     deptTree.value = handleTree(deptData)
   } finally {
     formLoading.value = false
@@ -80,7 +80,7 @@ const open = async (selectedList?: DeptApi.DeptVO[]) => {
     await nextTick()
     const selectedIds = selectedList
       .map((dept) => dept.id)
-      .filter((id): id is number => id !== undefined)
+      .filter((id): id is string | number => id !== undefined)
     selectedDeptIds.value = selectedIds
     treeRef.value?.setCheckedKeys(selectedIds)
   }

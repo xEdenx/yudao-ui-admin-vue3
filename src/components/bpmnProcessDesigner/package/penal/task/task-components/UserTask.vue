@@ -229,10 +229,6 @@ import {
   MULTI_LEVEL_DEPT
 } from '@/components/SimpleProcessDesignerV2/src/consts'
 import { defaultProps } from '@/utils/tree'
-import * as RoleApi from '@/api/system/role'
-import * as PostApi from '@/api/system/post'
-import * as UserApi from '@/api/system/user'
-import * as UserGroupApi from '@/api/bpm/userGroup'
 import ProcessExpressionDialog from './ProcessExpressionDialog.vue'
 import { ProcessExpressionVO } from '@/api/bpm/processExpression'
 import { useFormFieldsPermission } from '@/components/SimpleProcessDesignerV2/src/node'
@@ -266,11 +262,11 @@ const portalCandidateParam = computed({
 const bpmnElement = ref()
 const bpmnInstances = () => (window as any)?.bpmnInstances
 
-const roleOptions = ref<RoleApi.RoleVO[]>([]) // 角色列表
+const roleOptions = ref<any[]>([]) // 角色列表
 const deptTreeOptions = ref() // 部门树
-const postOptions = ref<PostApi.PostVO[]>([]) // 岗位列表
-const userOptions = ref<UserApi.UserVO[]>([]) // 用户列表
-const userGroupOptions = ref<UserGroupApi.UserGroupVO[]>([]) // 用户组列表
+const postOptions = ref<any[]>([]) // 岗位列表
+const userOptions = ref<any[]>([]) // 用户列表
+const userGroupOptions = ref<any[]>([]) // 用户组列表
 
 const { formFieldOptions } = useFormFieldsPermission(FieldPermissionType.READ)
 // 表单内用户字段选项, 必须是必填和用户选择器

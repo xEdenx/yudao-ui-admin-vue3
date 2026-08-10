@@ -579,7 +579,7 @@ import { setConfAndFields2 } from '@/utils/formCreate'
 import * as TaskApi from '@/api/bpm/task'
 import * as CommentApi from '@/api/bpm/comment'
 import * as ProcessInstanceApi from '@/api/bpm/processInstance'
-import * as UserApi from '@/api/system/user'
+import type { BpmDirectoryUserVO } from '@/api/bpm/portalDirectory'
 import {
   NodeType,
   OPERATION_BUTTON_NAME,
@@ -605,7 +605,7 @@ const emit = defineEmits(['success']) // 定义 success 事件，用于操作成
 const props = defineProps<{
   processInstance: any // 流程实例信息
   processDefinition: any // 流程定义信息
-  userOptions: UserApi.UserVO[]
+  userOptions: BpmDirectoryUserVO[]
   normalForm: any // 流程表单 formCreate
   normalFormApi: any // 流程表单 formCreate Api
   writableFields: string[] // 流程表单可以编辑的字段

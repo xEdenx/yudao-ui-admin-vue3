@@ -14,6 +14,7 @@ import { useSetting } from '@/layout/components/Setting'
 import { useAppStore } from '@/store/modules/app'
 import { useDesign } from '@/hooks/web/useDesign'
 import { Icon } from '@/components/Icon'
+import { isHeadlessBpmLogin } from '@/utils/auth'
 import { checkPermi } from '@/utils/permission'
 import { isHorizontalMenuLayout, isMixedNavLayout, isTwoColumnLayout } from '@/utils/layout'
 
@@ -47,12 +48,18 @@ const locale = computed(() => appStore.getLocale)
 // 消息图标
 const message = computed(() => appStore.getMessage)
 
+// Headless BPM 不提供 system 站内信；通知由 Portal 负责，避免轮询已移除的 system API。
+const showSystemMessage = computed(() => message.value && !isHeadlessBpmLogin())
+
 // IM即时通讯图标
 const im = computed(() => appStore.getIm)
 
 // 租户切换权限
 const hasTenantVisitPermission = computed(
-  () => import.meta.env.VITE_APP_TENANT_ENABLE === 'true' && checkPermi(['system:tenant:visit'])
+  () =>
+    !isHeadlessBpmLogin() &&
+    import.meta.env.VITE_APP_TENANT_ENABLE === 'true' &&
+    checkPermi(['system:tenant:visit'])
 )
 
 // 顶部聊天入口：用路由 name resolve 出完整 URL，在新标签页打开 IM 主页
@@ -116,7 +123,7 @@ export default defineComponent({
               color="var(--top-header-text-color)"
             ></LocaleDropdown>
           ) : undefined}
-          {message.value ? (
+          {showSystemMessage.value ? (
             <Message class="custom-hover" color="var(--top-header-text-color)"></Message>
           ) : undefined}
           {/* IM 聊天入口 */}

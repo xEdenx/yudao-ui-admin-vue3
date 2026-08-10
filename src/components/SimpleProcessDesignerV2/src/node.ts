@@ -1,9 +1,5 @@
 import { TaskStatusEnum } from '@/api/bpm/task'
-import * as RoleApi from '@/api/system/role'
-import * as DeptApi from '@/api/system/dept'
-import * as PostApi from '@/api/system/post'
-import * as UserApi from '@/api/system/user'
-import * as UserGroupApi from '@/api/bpm/userGroup'
+import type { BpmDirectoryDepartmentVO, BpmDirectoryUserVO } from '@/api/bpm/portalDirectory'
 import {
   SimpleFlowNode,
   CandidateStrategy,
@@ -199,11 +195,11 @@ export type CopyTaskFormType = {
  * @description 节点表单数据。 用于审批节点、抄送节点
  */
 export function useNodeForm(nodeType: NodeType) {
-  const roleOptions = inject<Ref<RoleApi.RoleVO[]>>('roleList', ref([])) // 角色列表
-  const postOptions = inject<Ref<PostApi.PostVO[]>>('postList', ref([])) // 岗位列表
-  const userOptions = inject<Ref<UserApi.UserVO[]>>('userList', ref([])) // 用户列表
-  const deptOptions = inject<Ref<DeptApi.DeptVO[]>>('deptList', ref([])) // 部门列表
-  const userGroupOptions = inject<Ref<UserGroupApi.UserGroupVO[]>>('userGroupList', ref([])) // 用户组列表
+  const roleOptions = inject<Ref<any[]>>('roleList', ref([])) // 角色列表
+  const postOptions = inject<Ref<any[]>>('postList', ref([])) // 岗位列表
+  const userOptions = inject<Ref<BpmDirectoryUserVO[]>>('userList', ref([])) // 用户列表
+  const deptOptions = inject<Ref<BpmDirectoryDepartmentVO[]>>('deptList', ref([])) // 部门列表
+  const userGroupOptions = inject<Ref<any[]>>('userGroupList', ref([])) // 用户组列表
   const deptTreeOptions = inject('deptTree', ref()) // 部门树
   const formFields = inject<Ref<string[]>>('formFields', ref([])) // 流程表单字段
   const configForm = ref<UserTaskFormType | CopyTaskFormType>()
@@ -234,7 +230,7 @@ export function useNodeForm(nodeType: NodeType) {
       if (configForm.value?.userIds!.length > 0) {
         const candidateNames: string[] = []
         userOptions?.value.forEach((item) => {
-          if (configForm.value?.userIds!.includes(item.id)) {
+          if (configForm.value?.userIds!.some((id) => String(id) === String(item.id))) {
             candidateNames.push(item.nickname)
           }
         })
@@ -262,7 +258,7 @@ export function useNodeForm(nodeType: NodeType) {
       if (configForm.value?.deptIds!.length > 0) {
         const candidateNames: string[] = []
         deptOptions?.value.forEach((item) => {
-          if (configForm.value?.deptIds!.includes(item.id!)) {
+          if (configForm.value?.deptIds!.some((id) => String(id) === String(item.id))) {
             candidateNames.push(item.name)
           }
         })

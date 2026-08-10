@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
 import { store } from '../index'
-// @ts-ignore
-import { DictDataVO } from '@/api/system/dict/types'
 import { CACHE_KEY, useCache } from '@/hooks/web/useCache'
 const { wsCache } = useCache('sessionStorage')
 import { getSimpleDictDataList } from '@/api/system/dict/dict.data'
+import { getSimpleDictDataList as getHeadlessBpmDictDataList } from '@/api/bpm/portalAuth'
+import { isHeadlessBpmLogin } from '@/utils/auth'
 
 export interface DictValueType {
   value: any
@@ -17,8 +17,32 @@ export interface DictTypeType {
   dictValue: DictValueType[]
 }
 export interface DictState {
-  dictMap: Map<string, any>
+  dictMap: any
   isSetDict: boolean
+}
+
+interface DictDataItem {
+  dictType: string
+  value: string | number | boolean
+  label: string
+  colorType?: string
+  cssClass?: string
+}
+
+const buildDictDataMap = (dictDataList: DictDataItem[]) => {
+  const dictDataMap: Recordable = {}
+  dictDataList.forEach((dictData) => {
+    if (!dictDataMap[dictData.dictType]) {
+      dictDataMap[dictData.dictType] = []
+    }
+    dictDataMap[dictData.dictType].push({
+      value: dictData.value,
+      label: dictData.label,
+      colorType: dictData.colorType,
+      cssClass: dictData.cssClass
+    })
+  })
+  return dictDataMap
 }
 
 export const useDictStore = defineStore('dict', {
@@ -40,6 +64,17 @@ export const useDictStore = defineStore('dict', {
   },
   actions: {
     async setDictMap() {
+      // Headless BPM 的状态文案由 BPM/Portal 契约提供，不能回退读取已移除的 system 字典。
+      if (isHeadlessBpmLogin()) {
+        const res = await getHeadlessBpmDictDataList()
+        if (!res || res.length === 0) {
+          return
+        }
+        this.dictMap = buildDictDataMap(res)
+        this.isSetDict = true
+        wsCache.set(CACHE_KEY.DICT_CACHE, this.dictMap, { exp: 60 })
+        return
+      }
       const dictMap = wsCache.get(CACHE_KEY.DICT_CACHE)
       if (dictMap) {
         this.dictMap = dictMap
@@ -50,21 +85,7 @@ export const useDictStore = defineStore('dict', {
           return
         }
         // 设置数据
-        const dictDataMap = new Map<string, any>()
-        res.forEach((dictData: DictDataVO) => {
-          // 获得 dictType 层级
-          const enumValueObj = dictDataMap[dictData.dictType]
-          if (!enumValueObj) {
-            dictDataMap[dictData.dictType] = []
-          }
-          // 处理 dictValue 层级
-          dictDataMap[dictData.dictType].push({
-            value: dictData.value,
-            label: dictData.label,
-            colorType: dictData.colorType,
-            cssClass: dictData.cssClass
-          })
-        })
+        const dictDataMap = buildDictDataMap(res)
         this.dictMap = dictDataMap
         this.isSetDict = true
         wsCache.set(CACHE_KEY.DICT_CACHE, dictDataMap, { exp: 60 }) // 60 秒 过期
@@ -78,26 +99,22 @@ export const useDictStore = defineStore('dict', {
     },
     async resetDict() {
       wsCache.delete(CACHE_KEY.DICT_CACHE)
+      if (isHeadlessBpmLogin()) {
+        const res = await getHeadlessBpmDictDataList()
+        if (!res || res.length === 0) {
+          return
+        }
+        this.dictMap = buildDictDataMap(res)
+        this.isSetDict = true
+        wsCache.set(CACHE_KEY.DICT_CACHE, this.dictMap, { exp: 60 })
+        return
+      }
       const res = await getSimpleDictDataList()
       if (!res || res.length === 0) {
         return
       }
       // 设置数据
-      const dictDataMap = new Map<string, any>()
-      res.forEach((dictData: DictDataVO) => {
-        // 获得 dictType 层级
-        const enumValueObj = dictDataMap[dictData.dictType]
-        if (!enumValueObj) {
-          dictDataMap[dictData.dictType] = []
-        }
-        // 处理 dictValue 层级
-        dictDataMap[dictData.dictType].push({
-          value: dictData.value,
-          label: dictData.label,
-          colorType: dictData.colorType,
-          cssClass: dictData.cssClass
-        })
-      })
+      const dictDataMap = buildDictDataMap(res)
       this.dictMap = dictDataMap
       this.isSetDict = true
       wsCache.set(CACHE_KEY.DICT_CACHE, dictDataMap, { exp: 60 }) // 60 秒 过期

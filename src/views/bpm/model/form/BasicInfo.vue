@@ -157,8 +157,7 @@
 
 <script lang="ts" setup>
 import { DICT_TYPE, getBoolDictOptions, getIntDictOptions } from '@/utils/dict'
-import { UserVO } from '@/api/system/user'
-import { DeptVO } from '@/api/system/dept'
+import type { BpmDirectoryDepartmentVO, BpmDirectoryUserVO } from '@/api/bpm/portalDirectory'
 import { CategoryVO } from '@/api/bpm/category'
 
 const props = defineProps({
@@ -177,9 +176,9 @@ const props = defineProps({
 })
 
 const formRef = ref()
-const selectedStartUsers = ref<UserVO[]>([])
-const selectedStartDepts = ref<DeptVO[]>([])
-const selectedManagerUsers = ref<UserVO[]>([])
+const selectedStartUsers = ref<BpmDirectoryUserVO[]>([])
+const selectedStartDepts = ref<BpmDirectoryDepartmentVO[]>([])
+const selectedManagerUsers = ref<BpmDirectoryUserVO[]>([])
 const userSelectFormRef = ref()
 const deptSelectFormRef = ref()
 const currentSelectType = ref<'start' | 'manager'>('start')
@@ -217,23 +216,23 @@ watch(
   () => modelData.value,
   (newVal) => {
     if (newVal.startUserIds?.length) {
-      selectedStartUsers.value = props.userList.filter((user: UserVO) =>
+      selectedStartUsers.value = props.userList.filter((user: BpmDirectoryUserVO) =>
         newVal.startUserIds.includes(user.id)
-      ) as UserVO[]
+      ) as BpmDirectoryUserVO[]
     } else {
       selectedStartUsers.value = []
     }
     if (newVal.startDeptIds?.length) {
-      selectedStartDepts.value = props.deptList.filter((dept: DeptVO) =>
+      selectedStartDepts.value = props.deptList.filter((dept: BpmDirectoryDepartmentVO) =>
         newVal.startDeptIds.includes(dept.id)
-      ) as DeptVO[]
+      ) as BpmDirectoryDepartmentVO[]
     } else {
       selectedStartDepts.value = []
     }
     if (newVal.managerUserIds?.length) {
-      selectedManagerUsers.value = props.userList.filter((user: UserVO) =>
+      selectedManagerUsers.value = props.userList.filter((user: BpmDirectoryUserVO) =>
         newVal.managerUserIds.includes(user.id)
-      ) as UserVO[]
+      ) as BpmDirectoryUserVO[]
     } else {
       selectedManagerUsers.value = []
     }
@@ -261,7 +260,7 @@ const openManagerUserSelect = () => {
 }
 
 /** 处理用户选择确认 */
-const handleUserSelectConfirm = (_, users: UserVO[]) => {
+const handleUserSelectConfirm = (_, users: BpmDirectoryUserVO[]) => {
   if (currentSelectType.value === 'start') {
     modelData.value = {
       ...modelData.value,
@@ -276,7 +275,7 @@ const handleUserSelectConfirm = (_, users: UserVO[]) => {
 }
 
 /** 处理部门选择确认 */
-const handleDeptSelectConfirm = (depts: DeptVO[]) => {
+const handleDeptSelectConfirm = (depts: BpmDirectoryDepartmentVO[]) => {
   modelData.value = {
     ...modelData.value,
     startDeptIds: depts.map((d) => d.id)
@@ -305,7 +304,7 @@ const handleStartUserTypeChange = (value: number) => {
 }
 
 /** 移除发起人 */
-const handleRemoveStartUser = (user: UserVO) => {
+const handleRemoveStartUser = (user: BpmDirectoryUserVO) => {
   modelData.value = {
     ...modelData.value,
     startUserIds: modelData.value.startUserIds.filter((id: number) => id !== user.id)
@@ -313,7 +312,7 @@ const handleRemoveStartUser = (user: UserVO) => {
 }
 
 /** 移除部门 */
-const handleRemoveStartDept = (dept: DeptVO) => {
+const handleRemoveStartDept = (dept: BpmDirectoryDepartmentVO) => {
   modelData.value = {
     ...modelData.value,
     startDeptIds: modelData.value.startDeptIds.filter((id: number) => id !== dept.id)
@@ -321,7 +320,7 @@ const handleRemoveStartDept = (dept: DeptVO) => {
 }
 
 /** 移除管理员 */
-const handleRemoveManagerUser = (user: UserVO) => {
+const handleRemoveManagerUser = (user: BpmDirectoryUserVO) => {
   modelData.value = {
     ...modelData.value,
     managerUserIds: modelData.value.managerUserIds.filter((id: number) => id !== user.id)

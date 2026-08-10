@@ -160,7 +160,7 @@
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 import { dateFormatter } from '@/utils/formatTime'
 import * as ProcessInstanceApi from '@/api/bpm/processInstance'
-import * as UserApi from '@/api/system/user'
+import { getSimpleUserList } from '@/api/bpm/portalDirectory'
 import * as DefinitionApi from '@/api/bpm/definition'
 import { parseFormFields } from '@/components/FormCreate/src/utils'
 import { ElMessageBox } from 'element-plus'
@@ -269,6 +269,6 @@ onMounted(async () => {
   // 获取流程列表
   await getList()
   // 获取用户列表
-  userList.value = await UserApi.getSimpleUserList()
+  userList.value = await getSimpleUserList()
 })
 </script>

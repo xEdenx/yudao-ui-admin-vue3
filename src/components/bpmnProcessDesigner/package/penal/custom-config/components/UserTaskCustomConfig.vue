@@ -211,7 +211,7 @@ import {
   ApproveType,
   ButtonSetting
 } from '@/components/SimpleProcessDesignerV2/src/consts'
-import * as UserApi from '@/api/system/user'
+import { getSimpleUserList, type BpmDirectoryUserVO } from '@/api/bpm/portalDirectory'
 import { useFormFieldsPermission } from '@/components/SimpleProcessDesignerV2/src/node'
 import { BpmModelFormType } from '@/utils/constants'
 
@@ -540,10 +540,10 @@ const updatePermission = (type: string) => {
   })
 }
 
-const userOptions = ref<UserApi.UserVO[]>([]) // 用户列表
+const userOptions = ref<BpmDirectoryUserVO[]>([]) // 用户列表
 onMounted(async () => {
   // 获得用户列表
-  userOptions.value = await UserApi.getSimpleUserList()
+  userOptions.value = await getSimpleUserList()
 })
 </script>
 

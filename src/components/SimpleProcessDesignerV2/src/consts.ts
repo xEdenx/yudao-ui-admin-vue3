@@ -1,5 +1,4 @@
-// @ts-ignore
-import { DictDataVO } from '@/api/system/dict/types'
+export type DictDataVO = any
 import { TaskStatusEnum } from '@/api/bpm/task'
 /**
  * 节点类型

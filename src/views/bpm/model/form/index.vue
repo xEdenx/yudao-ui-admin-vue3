@@ -92,8 +92,11 @@ import { getCurrentUserId } from '@/utils/auth'
 import * as ModelApi from '@/api/bpm/model'
 import * as FormApi from '@/api/bpm/form'
 import { CategoryApi, CategoryVO } from '@/api/bpm/category'
-import * as UserApi from '@/api/system/user'
-import * as DeptApi from '@/api/system/dept'
+import {
+  getSimpleDirectory,
+  type BpmDirectoryDepartmentVO,
+  type BpmDirectoryUserVO
+} from '@/api/bpm/portalDirectory'
 import * as DefinitionApi from '@/api/bpm/definition'
 import { BpmModelFormType, BpmModelType, BpmAutoApproveType } from '@/utils/constants'
 import BasicInfo from './BasicInfo.vue'
@@ -188,8 +191,8 @@ provide('modelData', formData)
 // 数据列表
 const formList = ref([])
 const categoryList = ref<CategoryVO[]>([])
-const userList = ref<UserApi.UserVO[]>([])
-const deptList = ref<DeptApi.DeptVO[]>([])
+const userList = ref<BpmDirectoryUserVO[]>([])
+const deptList = ref<BpmDirectoryDepartmentVO[]>([])
 
 /** 初始化数据 */
 const actionType = route.params.type as string
@@ -243,10 +246,10 @@ const initData = async () => {
   formList.value = await FormApi.getFormSimpleList()
   // 获取分类列表
   categoryList.value = await CategoryApi.getCategorySimpleList()
-  // 获取用户列表
-  userList.value = await UserApi.getSimpleUserList()
-  // 获取部门列表
-  deptList.value = await DeptApi.getSimpleDeptList()
+  // 获取 Portal 目录
+  const directory = await getSimpleDirectory()
+  userList.value = directory.users
+  deptList.value = directory.departments
 
   // 最终，设置 currentStep 切换到第一步
   currentStep.value = 0

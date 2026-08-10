@@ -134,8 +134,7 @@
 <script setup lang="ts">
 import { SimpleFlowNode, NodeType, FieldPermissionType, START_USER_BUTTON_SETTING } from '../consts'
 import { useWatchNode, useDrawer, useNodeName, useFormFieldsPermission } from '../node'
-import * as UserApi from '@/api/system/user'
-import * as DeptApi from '@/api/system/dept'
+import type { BpmDirectoryDepartmentVO, BpmDirectoryUserVO } from '@/api/bpm/portalDirectory'
 defineOptions({
   name: 'StartUserNodeConfig'
 })
@@ -150,9 +149,9 @@ const startUserIds = inject<Ref<any[]>>('startUserIds')
 // 可发起流程的部门编号
 const startDeptIds = inject<Ref<any[]>>('startDeptIds')
 // 用户列表
-const userOptions = inject<Ref<UserApi.UserVO[]>>('userList')
+const userOptions = inject<Ref<BpmDirectoryUserVO[]>>('userList')
 // 部门列表
-const deptOptions = inject<Ref<DeptApi.DeptVO[]>>('deptList')
+const deptOptions = inject<Ref<BpmDirectoryDepartmentVO[]>>('deptList')
 // 抽屉配置
 const { settingVisible, closeDrawer, openDrawer } = useDrawer()
 // 当前节点

@@ -40,8 +40,7 @@
 </template>
 <script lang="ts" setup>
 import { defaultProps, handleTree } from '@/utils/tree'
-import * as DeptApi from '@/api/system/dept'
-import * as UserApi from '@/api/system/user'
+import { getSimpleDirectory, type BpmDirectoryUserVO } from '@/api/bpm/portalDirectory'
 
 defineOptions({ name: 'UserSelectForm' })
 const emit = defineEmits<{
@@ -51,8 +50,8 @@ const { t } = useI18n() // 国际
 const message = useMessage() // 消息弹窗
 const deptTree = ref<Tree[]>([]) // 部门树形结构化
 const deptList = ref<any[]>([]) // 保存扁平化的部门列表数据
-const userList = ref<UserApi.UserVO[]>([]) // 所有用户列表
-const filteredUserList = ref<UserApi.UserVO[]>([]) // 当前部门过滤后的用户列表
+const userList = ref<BpmDirectoryUserVO[]>([]) // 所有用户列表
+const filteredUserList = ref<BpmDirectoryUserVO[]>([]) // 当前部门过滤后的用户列表
 const selectedUserIdList: any = ref([]) // 选中的用户列表
 const dialogVisible = ref(false) // 弹窗的是否展示
 const formLoading = ref(false) // 表单的加载中
@@ -75,15 +74,16 @@ const transferUserList = computed(() => {
 })
 
 /** 打开弹窗 */
-const open = async (id: number, selectedList?: any[]) => {
+const open = async (id: string | number, selectedList?: any[]) => {
   activityId.value = id
   resetForm()
 
   // 加载部门、用户列表
-  const deptData = await DeptApi.getSimpleDeptList()
+  const directory = await getSimpleDirectory()
+  const deptData = directory.departments
   deptList.value = deptData // 保存扁平结构的部门数据
   deptTree.value = handleTree(deptData) // 转换成树形结构
-  userList.value = await UserApi.getSimpleUserList()
+  userList.value = directory.users
 
   // 初始状态下，过滤列表等于所有用户列表
   filteredUserList.value = [...userList.value]
@@ -92,7 +92,7 @@ const open = async (id: number, selectedList?: any[]) => {
 }
 
 /** 获取指定部门及其所有子部门的ID列表 */
-const getChildDeptIds = (deptId: number, deptList: any[]): number[] => {
+const getChildDeptIds = (deptId: string | number, deptList: any[]): Array<string | number> => {
   const ids = [deptId]
   const children = deptList.filter((dept) => dept.parentId === deptId)
   children.forEach((child) => {
@@ -102,7 +102,7 @@ const getChildDeptIds = (deptId: number, deptList: any[]): number[] => {
 }
 
 /** 获取部门过滤后的用户列表 */
-const filterUserList = async (deptId?: number) => {
+const filterUserList = async (deptId?: string | number) => {
   formLoading.value = true
   try {
     if (!deptId) {
@@ -115,7 +115,9 @@ const filterUserList = async (deptId?: number) => {
     const deptIds = getChildDeptIds(deptId, deptList.value)
 
     // 过滤出这些部门下的用户
-    filteredUserList.value = userList.value.filter((user) => deptIds.includes(user.deptId))
+    filteredUserList.value = userList.value.filter(
+      (user) => user.deptId !== undefined && deptIds.includes(user.deptId)
+    )
   } finally {
     formLoading.value = false
   }

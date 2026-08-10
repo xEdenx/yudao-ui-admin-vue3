@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import * as ProcessInstanceApi from '@/api/bpm/processInstance'
-import * as AreaApi from '@/api/system/area'
-import * as DeptApi from '@/api/system/dept'
-import * as UserApi from '@/api/system/user'
+import { getAreaTree, getSimpleDirectory } from '@/api/bpm/portalDirectory'
 import { useUserStore } from '@/store/modules/user'
 import { formatDate } from '@/utils/formatTime'
 import {
@@ -281,18 +279,19 @@ const loadPrintLookupMaps = async (formFieldsObj: FormFieldRule[]) => {
   const hasUserSelect = formFieldsObj.some((item) => item.type === 'UserSelect')
   const hasDeptSelect = formFieldsObj.some((item) => item.type === 'DeptSelect')
 
-  const [areaList, userList, deptList] = await Promise.all([
-    hasAreaSelect ? AreaApi.getAreaTree() : Promise.resolve([]),
-    hasUserSelect ? UserApi.getSimpleUserList() : Promise.resolve([]),
-    hasDeptSelect ? DeptApi.getSimpleDeptList() : Promise.resolve([])
+  const [areaList, directory] = await Promise.all([
+    hasAreaSelect ? getAreaTree() : Promise.resolve([]),
+    hasUserSelect || hasDeptSelect
+      ? getSimpleDirectory()
+      : Promise.resolve({ users: [], departments: [] })
   ])
+  const userList = directory.users
+  const deptList = directory.departments
 
   return {
-    areaMap: flattenAreaTree(areaList as AreaNode[]),
+    areaMap: flattenAreaTree(areaList as unknown as AreaNode[]),
     deptMap: new Map((deptList ?? []).map((item) => [String(item.id), item.name] as const)),
-    userMap: new Map(
-      (userList ?? []).map((item) => [String(item.id), item.nickname ?? item.username] as const)
-    )
+    userMap: new Map((userList ?? []).map((item) => [String(item.id), item.nickname] as const))
   } satisfies PrintLookupMaps
 }
 

@@ -30,11 +30,18 @@ const menu = (
 })
 
 /**
- * 返回原 BPM 菜单组；运行用户只能看到审批中心，模型管理员获得完整的原工作流程菜单。
+ * 返回 Headless BPM 支持的菜单组；运行用户只能看到审批中心，模型管理员获得流程维护菜单。
  */
 export const getHeadlessBpmMenus = (roles: string[]): AppCustomRouteRecordRaw[] => {
   const approvalCenter = menu(1200, 1185, '审批中心', 'task', 'fa:tasks', '', [
-    menu(2720, 1200, '发起流程', 'create', 'fa-solid:grin-stars', 'bpm/processInstance/create/index'),
+    menu(
+      2720,
+      1200,
+      '发起流程',
+      'create',
+      'fa-solid:grin-stars',
+      'bpm/processInstance/create/index'
+    ),
     menu(1201, 1200, '我的流程', 'my', 'fa-solid:book', 'bpm/processInstance/index'),
     menu(1207, 1200, '待办任务', 'todo', 'fa:slack', 'bpm/task/todo/index'),
     menu(1208, 1200, '已办任务', 'done', 'fa:delicious', 'bpm/task/done/index'),
@@ -48,7 +55,6 @@ export const getHeadlessBpmMenus = (roles: string[]): AppCustomRouteRecordRaw[] 
         menu(1193, 1186, '流程模型', 'model', 'fa-solid:project-diagram', 'bpm/model/index'),
         menu(1187, 1186, '流程表单', 'form', 'fa:hdd-o', 'bpm/form/index'),
         menu(2714, 1186, '流程分类', 'category', 'fa:object-ungroup', 'bpm/category/index'),
-        menu(1209, 1186, '用户分组', 'user-group', 'fa:user-secret', 'bpm/group/index'),
         menu(
           2726,
           1186,
@@ -57,14 +63,23 @@ export const getHeadlessBpmMenus = (roles: string[]): AppCustomRouteRecordRaw[] 
           'fa:assistive-listening-systems',
           'bpm/processListener/index'
         ),
-        menu(2731, 1186, '流程表达式', 'process-expression', 'fa:wpexplorer', 'bpm/processExpression/index'),
-        menu(2721, 1186, '流程实例', 'process-instance/manager', 'fa:square', 'bpm/processInstance/manager/index'),
+        menu(
+          2731,
+          1186,
+          '流程表达式',
+          'process-expression',
+          'fa:wpexplorer',
+          'bpm/processExpression/index'
+        ),
+        menu(
+          2721,
+          1186,
+          '流程实例',
+          'process-instance/manager',
+          'fa:square',
+          'bpm/processInstance/manager/index'
+        ),
         menu(2724, 1186, '流程任务', 'process-tasnk', 'ep:collection-tag', 'bpm/task/manager/index')
-      ])
-    )
-    children.unshift(
-      menu(5, 1185, 'OA 示例', 'oa', 'fa:road', '', [
-        menu(1118, 5, '请假查询', 'leave', 'fa:leanpub', 'bpm/oa/leave/index')
       ])
     )
   }
