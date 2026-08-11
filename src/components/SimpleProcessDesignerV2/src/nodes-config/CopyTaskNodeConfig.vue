@@ -253,7 +253,6 @@ import {
   SimpleFlowNode,
   CandidateStrategy,
   NodeType,
-  CANDIDATE_STRATEGY,
   FieldPermissionType,
   MULTI_LEVEL_DEPT
 } from '../consts'
@@ -265,6 +264,7 @@ import {
   useNodeForm,
   CopyTaskFormType
 } from '../node'
+import { getCandidateStrategyList, type BpmPortalDictDataVO } from '@/api/bpm/portalAuth'
 import { defaultProps } from '@/utils/tree'
 defineOptions({
   name: 'CopyTaskNodeConfig'
@@ -274,6 +274,10 @@ const props = defineProps({
     type: Object as () => SimpleFlowNode,
     required: true
   }
+})
+const candidateStrategies = ref<BpmPortalDictDataVO[]>([])
+onMounted(async () => {
+  candidateStrategies.value = await getCandidateStrategyList()
 })
 const deptLevelLabel = computed(() => {
   let label = '部门负责人来源'
@@ -331,7 +335,7 @@ const {
 const configForm = tempConfigForm as Ref<CopyTaskFormType>
 // 抄送人策略， 去掉发起人自选 和 发起人自己
 const copyUserStrategies = computed(() => {
-  return CANDIDATE_STRATEGY.filter((item) => item.value !== CandidateStrategy.START_USER)
+  return candidateStrategies.value.filter((item) => item.value !== CandidateStrategy.START_USER)
 })
 // 改变抄送人设置策略
 const changeCandidateStrategy = () => {

@@ -8,7 +8,7 @@
         @change="changeCandidateStrategy"
       >
         <el-option
-          v-for="(dict, index) in CANDIDATE_STRATEGY"
+          v-for="(dict, index) in candidateStrategies"
           :key="index"
           :label="dict.label"
           :value="dict.value"
@@ -208,11 +208,11 @@
 
 <script lang="ts" setup>
 import {
-  CANDIDATE_STRATEGY,
   CandidateStrategy,
   FieldPermissionType,
   MULTI_LEVEL_DEPT
 } from '@/components/SimpleProcessDesignerV2/src/consts'
+import { getCandidateStrategyList, type BpmPortalDictDataVO } from '@/api/bpm/portalAuth'
 import { defaultProps } from '@/utils/tree'
 import ProcessExpressionDialog from './ProcessExpressionDialog.vue'
 import { ProcessExpressionVO } from '@/api/bpm/processExpression'
@@ -224,6 +224,10 @@ const props = defineProps({
   type: String
 })
 const prefix = inject('prefix')
+const candidateStrategies = ref<BpmPortalDictDataVO[]>([])
+onMounted(async () => {
+  candidateStrategies.value = await getCandidateStrategyList()
+})
 type CandidateParam = Array<string | number> | string | number
 type UserTaskForm = {
   candidateStrategy?: CandidateStrategy

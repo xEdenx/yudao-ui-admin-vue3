@@ -537,11 +537,6 @@ NODE_DEFAULT_NAME.set(NodeType.TRIGGER_NODE, '触发器')
 NODE_DEFAULT_NAME.set(NodeType.TRANSACTOR_NODE, '办理人')
 NODE_DEFAULT_NAME.set(NodeType.CHILD_PROCESS_NODE, '子流程')
 
-// 候选人策略。暂时不从字典中取。 后续可能调整。控制显示顺序
-export const CANDIDATE_STRATEGY: DictDataVO[] = [
-  { label: '发起人自选', value: CandidateStrategy.START_USER_SELECT },
-  { label: '按 Portal 角色', value: CandidateStrategy.ROLE }
-]
 // 审批节点 的审批类型
 export const APPROVE_TYPE: DictDataVO[] = [
   { label: '人工审批', value: ApproveType.USER },

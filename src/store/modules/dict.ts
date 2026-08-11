@@ -2,9 +2,7 @@ import { defineStore } from 'pinia'
 import { store } from '../index'
 import { CACHE_KEY, useCache } from '@/hooks/web/useCache'
 const { wsCache } = useCache('sessionStorage')
-import { getSimpleDictDataList } from '@/api/system/dict/dict.data'
 import { getSimpleDictDataList as getHeadlessBpmDictDataList } from '@/api/bpm/portalAuth'
-import { isHeadlessBpmLogin } from '@/utils/auth'
 
 export interface DictValueType {
   value: any
@@ -64,23 +62,13 @@ export const useDictStore = defineStore('dict', {
   },
   actions: {
     async setDictMap() {
-      // Headless BPM 的状态文案由 BPM/Portal 契约提供，不能回退读取已移除的 system 字典。
-      if (isHeadlessBpmLogin()) {
-        const res = await getHeadlessBpmDictDataList()
-        if (!res || res.length === 0) {
-          return
-        }
-        this.dictMap = buildDictDataMap(res)
-        this.isSetDict = true
-        wsCache.set(CACHE_KEY.DICT_CACHE, this.dictMap, { exp: 60 })
-        return
-      }
+      // 管理端只支持 Headless BPM；固定字典全部由 BPM/Portal 契约提供。
       const dictMap = wsCache.get(CACHE_KEY.DICT_CACHE)
       if (dictMap) {
         this.dictMap = dictMap
         this.isSetDict = true
       } else {
-        const res = await getSimpleDictDataList()
+        const res = await getHeadlessBpmDictDataList()
         if (!res || res.length === 0) {
           return
         }
@@ -99,17 +87,7 @@ export const useDictStore = defineStore('dict', {
     },
     async resetDict() {
       wsCache.delete(CACHE_KEY.DICT_CACHE)
-      if (isHeadlessBpmLogin()) {
-        const res = await getHeadlessBpmDictDataList()
-        if (!res || res.length === 0) {
-          return
-        }
-        this.dictMap = buildDictDataMap(res)
-        this.isSetDict = true
-        wsCache.set(CACHE_KEY.DICT_CACHE, this.dictMap, { exp: 60 })
-        return
-      }
-      const res = await getSimpleDictDataList()
+      const res = await getHeadlessBpmDictDataList()
       if (!res || res.length === 0) {
         return
       }

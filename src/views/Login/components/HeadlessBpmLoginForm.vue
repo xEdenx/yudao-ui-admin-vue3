@@ -1,6 +1,5 @@
 <template>
   <el-form
-    v-show="getShow"
     ref="formRef"
     :model="formData"
     :rules="rules"
@@ -9,9 +8,7 @@
     size="large"
     @keyup.enter="handleLogin"
   >
-    <el-form-item>
-      <LoginFormTitle class="w-full" />
-    </el-form-item>
+    <el-form-item><h2>Headless BPM Portal 登录</h2></el-form-item>
     <el-alert
       :closable="false"
       class="mb-18px"
@@ -29,34 +26,26 @@
         登录并读取 Portal 用户
       </el-button>
     </el-form-item>
-    <el-form-item>
-      <el-button class="w-full" @click="handleBackLogin">返回普通登录</el-button>
-    </el-form-item>
   </el-form>
 </template>
 
 <script lang="ts" setup>
-import LoginFormTitle from './LoginFormTitle.vue'
-import { LoginStateEnum, useFormValid, useLoginState } from './useLogin'
 import * as BpmPortalAuthApi from '@/api/bpm/portalAuth'
 import * as authUtil from '@/utils/auth'
 import { useUserStore } from '@/store/modules/user'
 
 defineOptions({ name: 'HeadlessBpmLoginForm' })
 
-const { getLoginState, handleBackLogin } = useLoginState()
 const { push } = useRouter()
 const userStore = useUserStore()
 const formRef = ref()
-const { validForm } = useFormValid(formRef)
 const loading = ref(false)
 const formData = reactive({ userId: 'portal-requester-a1f2', password: 'portal-local-dev' })
-const getShow = computed(() => unref(getLoginState) === LoginStateEnum.HEADLESS_BPM)
 const rules = { userId: [required], password: [required] }
 
 const handleLogin = async () => {
-  const data = await validForm()
-  if (!data) return
+  const valid = await formRef.value?.validate()
+  if (!valid) return
   loading.value = true
   try {
     const response = await BpmPortalAuthApi.mockLogin(formData)
@@ -70,7 +59,6 @@ const handleLogin = async () => {
       expiresTime: 0
     })
     authUtil.setTenantId(response.tenantId)
-    authUtil.setHeadlessBpmLogin()
     userStore.resetState()
     await push('/bpm/task/todo')
   } finally {

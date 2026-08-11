@@ -1,6 +1,5 @@
 import { useCache, CACHE_KEY } from '@/hooks/web/useCache'
 import { TokenType } from '@/api/login/types'
-import { decrypt, encrypt } from '@/utils/jsencrypt'
 
 const { wsCache } = useCache()
 
@@ -21,8 +20,6 @@ export const getRefreshToken = () => {
 
 // 设置token
 export const setToken = (token: TokenType) => {
-  // 新 token 默认属于 system 登录；Headless BPM 登录会在其后显式标记。
-  wsCache.delete(CACHE_KEY.HeadlessBpmLogin)
   wsCache.set(RefreshTokenKey, token.refreshToken)
   wsCache.set(AccessTokenKey, token.accessToken)
 }
@@ -31,49 +28,16 @@ export const setToken = (token: TokenType) => {
 export const removeToken = () => {
   wsCache.delete(AccessTokenKey)
   wsCache.delete(RefreshTokenKey)
-  wsCache.delete(CACHE_KEY.HeadlessBpmLogin)
 }
-
-/** 当前 token 是否由本地 Headless BPM Mock 登录页获取。 */
-export const isHeadlessBpmLogin = () => wsCache.get(CACHE_KEY.HeadlessBpmLogin) === true
-
-/** 仅供本地 Headless BPM 登录成功后调用。 */
-export const setHeadlessBpmLogin = () => wsCache.set(CACHE_KEY.HeadlessBpmLogin, true)
 
 /** 格式化token（jwt格式） */
 export const formatToken = (token: string): string => {
   return 'Bearer ' + token
 }
-// ========== 账号相关 ==========
-
 /** 获取当前登录用户编号 */
 export const getCurrentUserId = (): number => {
   const user = wsCache.get(CACHE_KEY.USER)?.user
   return Number(user?.id) || 0
-}
-
-export type LoginFormType = {
-  tenantName: string
-  username: string
-  password: string
-  rememberMe: boolean
-}
-
-export const getLoginForm = () => {
-  const loginForm: LoginFormType = wsCache.get(CACHE_KEY.LoginForm)
-  if (loginForm) {
-    loginForm.password = decrypt(loginForm.password) as string
-  }
-  return loginForm
-}
-
-export const setLoginForm = (loginForm: LoginFormType) => {
-  loginForm.password = encrypt(loginForm.password) as string
-  wsCache.set(CACHE_KEY.LoginForm, loginForm, { exp: 30 * 24 * 60 * 60 })
-}
-
-export const removeLoginForm = () => {
-  wsCache.delete(CACHE_KEY.LoginForm)
 }
 
 // ========== 租户相关 ==========

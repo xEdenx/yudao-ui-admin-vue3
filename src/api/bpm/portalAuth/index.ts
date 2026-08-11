@@ -52,7 +52,7 @@ export const mockLogin = (data: { userId: string; password: string }) => {
   return request.post<BpmPortalMockLoginVO>({
     url: '/bpm/portal-auth/login',
     data,
-    headers: { isEncrypt: false }
+    headers: { isEncrypt: false, isToken: false }
   })
 }
 
@@ -60,6 +60,14 @@ export const getCurrentUser = () => request.get<BpmPortalUserVO>({ url: '/bpm/po
 
 export const getSimpleDictDataList = () =>
   request.get<BpmPortalDictDataVO[]>({ url: '/bpm/portal-config/dict-data/simple-list' })
+
+/**
+ * 建模器候选人策略目录。由 BPM 后端决定可配置的枚举项；前端不维护静态策略列表。
+ */
+export const getCandidateStrategyList = async () => {
+  const dictionaryItems = await getSimpleDictDataList()
+  return dictionaryItems.filter((item) => item.dictType === 'bpm_task_candidate_strategy')
+}
 
 export const getSimpleDirectory = () =>
   request.get<BpmPortalDirectoryVO>({ url: '/bpm/portal-directory/simple-list' })

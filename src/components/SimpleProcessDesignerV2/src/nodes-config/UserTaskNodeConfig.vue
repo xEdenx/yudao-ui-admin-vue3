@@ -48,7 +48,7 @@
                 @change="changeCandidateStrategy"
               >
                 <el-row>
-                  <el-col v-for="(dict, index) in CANDIDATE_STRATEGY" :key="index" :span="8">
+                  <el-col v-for="(dict, index) in candidateStrategies" :key="index" :span="8">
                     <el-radio :value="dict.value" :label="dict.value">
                       {{ dict.label }}
                     </el-radio>
@@ -532,7 +532,6 @@ import {
   OPERATION_BUTTON_NAME,
   ButtonSetting,
   MULTI_LEVEL_DEPT,
-  CANDIDATE_STRATEGY,
   ASSIGN_START_USER_HANDLER_TYPES,
   TimeoutHandlerType,
   ASSIGN_EMPTY_HANDLER_TYPES,
@@ -541,6 +540,7 @@ import {
   ProcessVariableEnum,
   TRANSACTOR_DEFAULT_BUTTON_SETTING
 } from '../consts'
+import { getCandidateStrategyList, type BpmPortalDictDataVO } from '@/api/bpm/portalAuth'
 
 import {
   useWatchNode,
@@ -566,6 +566,10 @@ const props = defineProps({
 const emits = defineEmits<{
   'find:returnTaskNodes': [nodeList: SimpleFlowNode[]]
 }>()
+const candidateStrategies = ref<BpmPortalDictDataVO[]>([])
+onMounted(async () => {
+  candidateStrategies.value = await getCandidateStrategyList()
+})
 const deptLevelLabel = computed(() => {
   let label = '部门负责人来源'
   if (configForm.value.candidateStrategy == CandidateStrategy.MULTI_LEVEL_DEPT_LEADER) {

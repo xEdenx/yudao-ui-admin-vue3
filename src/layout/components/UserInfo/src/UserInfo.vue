@@ -13,7 +13,7 @@ defineOptions({ name: 'UserInfo' })
 
 const { t } = useI18n()
 
-const { push, replace } = useRouter()
+const { replace } = useRouter()
 
 const userStore = useUserStore()
 
@@ -43,11 +43,8 @@ const loginOut = async () => {
     })
     await userStore.loginOut()
     tagsViewStore.delAllViews()
-    replace('/login?redirect=/index')
+    replace('/login')
   } catch {}
-}
-const toProfile = async () => {
-  push('/user/profile')
 }
 const toDocument = () => {
   window.open('https://doc.iocoder.cn/')
@@ -64,10 +61,6 @@ const toDocument = () => {
     </div>
     <template #dropdown>
       <ElDropdownMenu>
-        <ElDropdownItem>
-          <Icon icon="ep:tools" />
-          <div @click="toProfile">{{ t('common.profile') }}</div>
-        </ElDropdownItem>
         <ElDropdownItem>
           <Icon icon="ep:menu" />
           <div @click="toDocument">{{ t('common.document') }}</div>

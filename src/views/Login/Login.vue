@@ -49,19 +49,7 @@
           <div
             class="m-auto h-[calc(100%-60px)] w-[100%] flex items-center at-2xl:max-w-500px at-lg:max-w-500px at-md:max-w-500px at-xl:max-w-500px"
           >
-            <!-- 账号登录 -->
-            <LoginForm class="m-auto h-auto p-20px lt-xl:(rounded-3xl light:bg-white)" />
-            <!-- 手机登录 -->
-            <MobileForm class="m-auto h-auto p-20px lt-xl:(rounded-3xl light:bg-white)" />
-            <!-- 二维码登录 -->
-            <QrCodeForm class="m-auto h-auto p-20px lt-xl:(rounded-3xl light:bg-white)" />
-            <!-- 注册 -->
-            <RegisterForm class="m-auto h-auto p-20px lt-xl:(rounded-3xl light:bg-white)" />
-            <!-- 三方登录 -->
-            <SSOLoginVue class="m-auto h-auto p-20px lt-xl:(rounded-3xl light:bg-white)" />
-            <!-- 忘记密码 -->
-            <ForgetPasswordForm class="m-auto h-auto p-20px lt-xl:(rounded-3xl light:bg-white)" />
-            <!-- 本地 Headless BPM Mock 登录 -->
+            <!-- 唯一支持的登录态：Headless BPM Portal 登录 -->
             <HeadlessBpmLoginForm class="m-auto h-auto p-20px lt-xl:(rounded-3xl light:bg-white)" />
           </div>
         </Transition>
@@ -77,15 +65,7 @@ import { useAppStore } from '@/store/modules/app'
 import { ThemeSwitch } from '@/layout/components/ThemeSwitch'
 import { LocaleDropdown } from '@/layout/components/LocaleDropdown'
 
-import {
-  LoginForm,
-  MobileForm,
-  QrCodeForm,
-  RegisterForm,
-  SSOLoginVue,
-  ForgetPasswordForm,
-  HeadlessBpmLoginForm
-} from './components'
+import HeadlessBpmLoginForm from './components/HeadlessBpmLoginForm.vue'
 
 defineOptions({ name: 'Login' })
 

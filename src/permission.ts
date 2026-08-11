@@ -1,7 +1,7 @@
 import router from './router'
 import type { RouteRecordRaw } from 'vue-router'
 import { isRelogin } from '@/config/axios/service'
-import { getAccessToken, isHeadlessBpmLogin } from '@/utils/auth'
+import { getAccessToken } from '@/utils/auth'
 import { useTitle } from '@/hooks/web/useTitle'
 import { useNProgress } from '@/hooks/web/useNProgress'
 import { usePageLoading } from '@/hooks/web/usePageLoading'
@@ -15,14 +15,7 @@ const { start, done } = useNProgress()
 const { loadStart, loadDone } = usePageLoading()
 
 // 路由不重定向白名单
-const whiteList = [
-  '/login',
-  '/social-login',
-  '/auth-redirect',
-  '/bind',
-  '/register',
-  '/oauthLogin/gitee'
-]
+const whiteList = ['/login', '/auth-redirect']
 
 // 路由加载前
 router.beforeEach(async (to, from, next) => {
@@ -35,9 +28,8 @@ router.beforeEach(async (to, from, next) => {
       const dictStore = useDictStoreWithOut()
       const userStore = useUserStoreWithOut()
       const permissionStore = usePermissionStoreWithOut()
-      // 异步加载字典
-      // 另外，间接 issue：https://gitee.com/yudaocode/yudao-ui-admin-vue3/issues/ID9FLI
-      if (!isHeadlessBpmLogin() && !dictStore.getIsSetDict) {
+      // Headless BPM 固定字典由 BPM 配置 API 提供。
+      if (!dictStore.getIsSetDict) {
         dictStore.setDictMap().then()
       }
       if (!userStore.getIsSetUser) {
@@ -52,12 +44,8 @@ router.beforeEach(async (to, from, next) => {
         const redirectPath = from.query.redirect
         // 修复跳转时不带参数的问题
         const redirect = typeof redirectPath === 'string' ? redirectPath : to.fullPath
-        const redirectLocation = parseRouteLocation(redirect)
-        const nextData =
-          to.fullPath === redirect
-            ? { ...to, replace: true }
-            : { ...redirectLocation, replace: true }
-        next(nextData)
+        // 动态路由刚注册完成，必须按原始 URL 重新匹配，不能复用登录前的 404 匹配结果。
+        next({ ...parseRouteLocation(redirect), replace: true })
       } else {
         next()
       }
