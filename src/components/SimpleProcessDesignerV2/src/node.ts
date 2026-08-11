@@ -133,13 +133,12 @@ export function useFormFieldsAndStartUser() {
 export type UserTaskFormType = {
   candidateStrategy: CandidateStrategy
   approveMethod: ApproveMethodType
-  roleIds?: number[] // 角色
+  portalRoleCode?: string // Portal 目标角色编码
   deptIds?: number[] // 部门
   deptLevel?: number // 部门层级
   userIds?: number[] // 用户
   userGroups?: number[] // 用户组
   postIds?: number[] // 岗位
-  portalRule?: string // Portal 远程候选人规则
   expression?: string // 流程表达式
   formUser?: string // 表单内用户字段
   formDept?: string // 表单内部门字段
@@ -179,13 +178,12 @@ export type UserTaskFormType = {
 
 export type CopyTaskFormType = {
   candidateStrategy: CandidateStrategy
-  roleIds?: number[] // 角色
+  portalRoleCode?: string // Portal 目标角色编码
   deptIds?: number[] // 部门
   deptLevel?: number // 部门层级
   userIds?: number[] // 用户
   userGroups?: number[] // 用户组
   postIds?: number[] // 岗位
-  portalRule?: string // Portal 远程候选人规则
   formUser?: string // 表单内用户字段
   formDept?: string // 表单内部门字段
   expression?: string // 流程表达式
@@ -195,7 +193,6 @@ export type CopyTaskFormType = {
  * @description 节点表单数据。 用于审批节点、抄送节点
  */
 export function useNodeForm(nodeType: NodeType) {
-  const roleOptions = inject<Ref<any[]>>('roleList', ref([])) // 角色列表
   const postOptions = inject<Ref<any[]>>('postList', ref([])) // 岗位列表
   const userOptions = inject<Ref<BpmDirectoryUserVO[]>>('userList', ref([])) // 用户列表
   const deptOptions = inject<Ref<BpmDirectoryDepartmentVO[]>>('deptList', ref([])) // 部门列表
@@ -237,17 +234,9 @@ export function useNodeForm(nodeType: NodeType) {
         showText = `指定成员：${candidateNames.join(',')}`
       }
     }
-    // 指定角色
+    // Portal 角色
     if (configForm.value?.candidateStrategy === CandidateStrategy.ROLE) {
-      if (configForm.value.roleIds!.length > 0) {
-        const candidateNames: string[] = []
-        roleOptions?.value.forEach((item) => {
-          if (configForm.value?.roleIds!.includes(item.id)) {
-            candidateNames.push(item.name)
-          }
-        })
-        showText = `指定角色：${candidateNames.join(',')}`
-      }
+      showText = `Portal 角色：${configForm.value.portalRoleCode || ''}`
     }
     // 指定部门
     if (
@@ -318,9 +307,6 @@ export function useNodeForm(nodeType: NodeType) {
     if (configForm.value?.candidateStrategy === CandidateStrategy.START_USER_SELECT) {
       showText = `发起人自选`
     }
-    if (configForm.value?.candidateStrategy === CandidateStrategy.HEADLESS_REMOTE) {
-      showText = `Portal 远程候选人：${configForm.value.portalRule || '由 Portal 默认规则解算'}`
-    }
     // 发起人自己
     if (configForm.value?.candidateStrategy === CandidateStrategy.START_USER) {
       showText = `发起人自己`
@@ -355,7 +341,7 @@ export function useNodeForm(nodeType: NodeType) {
         candidateParam = configForm.value.userIds!.join(',')
         break
       case CandidateStrategy.ROLE:
-        candidateParam = configForm.value.roleIds!.join(',')
+        candidateParam = configForm.value.portalRoleCode
         break
       case CandidateStrategy.POST:
         candidateParam = configForm.value.postIds!.join(',')
@@ -392,9 +378,6 @@ export function useNodeForm(nodeType: NodeType) {
         candidateParam = deptFieldOnForm.concat('|' + configForm.value.deptLevel + '')
         break
       }
-      case CandidateStrategy.HEADLESS_REMOTE:
-        candidateParam = configForm.value.portalRule
-        break
       default:
         break
     }
@@ -416,7 +399,7 @@ export function useNodeForm(nodeType: NodeType) {
         break
       }
       case CandidateStrategy.ROLE:
-        configForm.value.roleIds = candidateParam.split(',').map((item) => +item)
+        configForm.value.portalRoleCode = candidateParam
         break
       case CandidateStrategy.POST:
         configForm.value.postIds = candidateParam.split(',').map((item) => +item)
@@ -455,16 +438,12 @@ export function useNodeForm(nodeType: NodeType) {
         configForm.value.deptLevel = +paramArray[1]
         break
       }
-      case CandidateStrategy.HEADLESS_REMOTE:
-        configForm.value.portalRule = candidateParam
-        break
       default:
         break
     }
   }
   return {
     configForm,
-    roleOptions,
     postOptions,
     userOptions,
     userGroupOptions,

@@ -98,7 +98,6 @@ watch(
   { immediate: true }
 )
 
-const roleOptions = ref<any[]>([]) // 角色列表
 const postOptions = ref<any[]>([]) // 岗位列表
 const userOptions = ref<BpmDirectoryUserVO[]>([]) // 用户列表
 const deptOptions = ref<BpmDirectoryDepartmentVO[]>([]) // 部门列表
@@ -107,7 +106,6 @@ const userGroupOptions = ref<any[]>([]) // 用户组列表
 
 provide('formFields', formFields)
 provide('formType', formType)
-provide('roleList', roleOptions)
 provide('postList', postOptions)
 provide('userList', userOptions)
 provide('deptList', deptOptions)

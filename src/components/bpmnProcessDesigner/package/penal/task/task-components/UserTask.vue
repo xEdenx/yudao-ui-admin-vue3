@@ -16,30 +16,15 @@
       </el-select>
     </el-form-item>
     <el-form-item
-      v-if="userTaskForm.candidateStrategy === CandidateStrategy.HEADLESS_REMOTE"
-      label="Portal 候选人规则"
+      v-if="userTaskForm.candidateStrategy == CandidateStrategy.ROLE"
+      label="Portal 目标角色"
       prop="candidateParam"
     >
       <el-input
-        v-model="portalCandidateParam"
-        placeholder="例如：部门负责人、业务角色编码或 Portal 规则编码"
+        v-model="portalRoleCode"
+        placeholder="例如：ROLE_ADMIN"
         @change="updateElementTask"
       />
-    </el-form-item>
-    <el-form-item
-      v-if="userTaskForm.candidateStrategy == CandidateStrategy.ROLE"
-      label="指定角色"
-      prop="candidateParam"
-    >
-      <el-select
-        v-model="userTaskForm.candidateParam"
-        clearable
-        multiple
-        style="width: 100%"
-        @change="updateElementTask"
-      >
-        <el-option v-for="item in roleOptions" :key="item.id" :label="item.name" :value="item.id" />
-      </el-select>
     </el-form-item>
     <el-form-item
       v-if="
@@ -250,7 +235,7 @@ const userTaskForm = ref<UserTaskForm>({
   candidateParam: [], // 分配选项
   skipExpression: '' // 跳过表达式
 })
-const portalCandidateParam = computed({
+const portalRoleCode = computed({
   get: () => {
     const value = userTaskForm.value.candidateParam
     return value instanceof Array ? '' : String(value ?? '')
@@ -262,7 +247,6 @@ const portalCandidateParam = computed({
 const bpmnElement = ref()
 const bpmnInstances = () => (window as any)?.bpmnInstances
 
-const roleOptions = ref<any[]>([]) // 角色列表
 const deptTreeOptions = ref() // 部门树
 const postOptions = ref<any[]>([]) // 岗位列表
 const userOptions = ref<any[]>([]) // 用户列表
@@ -312,6 +296,8 @@ const resetTaskForm = () => {
     if (userTaskForm.value.candidateStrategy === CandidateStrategy.EXPRESSION) {
       // 特殊：流程表达式，只有一个 input 输入框
       userTaskForm.value.candidateParam = [candidateParamStr]
+    } else if (userTaskForm.value.candidateStrategy === CandidateStrategy.ROLE) {
+      userTaskForm.value.candidateParam = candidateParamStr
     } else if (userTaskForm.value.candidateStrategy == CandidateStrategy.MULTI_LEVEL_DEPT_LEADER) {
       // 特殊：多级不部门负责人，需要通过'|'分割
       userTaskForm.value.candidateParam = candidateParamStr

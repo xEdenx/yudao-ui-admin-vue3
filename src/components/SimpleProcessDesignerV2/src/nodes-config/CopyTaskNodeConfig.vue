@@ -45,17 +45,10 @@
 
             <el-form-item
               v-if="configForm.candidateStrategy == CandidateStrategy.ROLE"
-              label="指定角色"
-              prop="roleIds"
+              label="Portal 目标角色"
+              prop="portalRoleCode"
             >
-              <el-select v-model="configForm.roleIds" clearable multiple style="width: 100%">
-                <el-option
-                  v-for="item in roleOptions"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                />
-              </el-select>
+              <el-input v-model="configForm.portalRoleCode" placeholder="例如：ROLE_ADMIN" />
             </el-form-item>
             <el-form-item
               v-if="
@@ -316,7 +309,7 @@ const formRef = ref() // 表单 Ref
 const formRules = reactive({
   candidateStrategy: [{ required: true, message: '抄送人设置不能为空', trigger: 'change' }],
   userIds: [{ required: true, message: '用户不能为空', trigger: 'change' }],
-  roleIds: [{ required: true, message: '角色不能为空', trigger: 'change' }],
+  portalRoleCode: [{ required: true, message: 'Portal 角色编码不能为空', trigger: 'blur' }],
   deptIds: [{ required: true, message: '部门不能为空', trigger: 'change' }],
   userGroups: [{ required: true, message: '用户组不能为空', trigger: 'change' }],
   postIds: [{ required: true, message: '岗位不能为空', trigger: 'change' }],
@@ -327,7 +320,6 @@ const formRules = reactive({
 
 const {
   configForm: tempConfigForm,
-  roleOptions,
   postOptions,
   userOptions,
   userGroupOptions,
@@ -345,7 +337,7 @@ const copyUserStrategies = computed(() => {
 const changeCandidateStrategy = () => {
   configForm.value.userIds = []
   configForm.value.deptIds = []
-  configForm.value.roleIds = []
+  configForm.value.portalRoleCode = ''
   configForm.value.postIds = []
   configForm.value.userGroups = []
   configForm.value.deptLevel = 1

@@ -140,9 +140,9 @@ export interface SimpleFlowNode {
 // 候选人策略枚举 （ 用于审批节点。抄送节点 )
 export enum CandidateStrategy {
   /**
-   * 指定角色
+   * 按 Portal 角色解算候选人
    */
-  ROLE = 10,
+  ROLE = 70,
   /**
    * 部门成员
    */
@@ -183,10 +183,6 @@ export enum CandidateStrategy {
    * 发起人连续多级部门的负责人
    */
   START_USER_MULTI_LEVEL_DEPT_LEADER = 38,
-  /**
-   * 由 Portal 在节点到达时远程解算候选人
-   */
-  HEADLESS_REMOTE = 70,
   /**
    * 指定用户组
    */
@@ -544,7 +540,7 @@ NODE_DEFAULT_NAME.set(NodeType.CHILD_PROCESS_NODE, '子流程')
 // 候选人策略。暂时不从字典中取。 后续可能调整。控制显示顺序
 export const CANDIDATE_STRATEGY: DictDataVO[] = [
   { label: '发起人自选', value: CandidateStrategy.START_USER_SELECT },
-  { label: 'Portal 远程候选人', value: CandidateStrategy.HEADLESS_REMOTE }
+  { label: '按 Portal 角色', value: CandidateStrategy.ROLE }
 ]
 // 审批节点 的审批类型
 export const APPROVE_TYPE: DictDataVO[] = [
