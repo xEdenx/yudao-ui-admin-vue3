@@ -5,6 +5,15 @@
  */
 const headlessStaticRouter: AppRouteRecordRaw[] = [
   {
+    path: '/',
+    redirect: '/bpm/task/todo',
+    name: 'Home',
+    meta: {
+      hidden: true,
+      noTagsView: true
+    }
+  },
+  {
     path: '/login',
     component: () => import('@/views/Login/Login.vue'),
     name: 'Login',
