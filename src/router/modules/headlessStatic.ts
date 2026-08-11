@@ -24,6 +24,15 @@ const headlessStaticRouter: AppRouteRecordRaw[] = [
     }
   },
   {
+    path: '/redirect/:path(.*)',
+    component: () => import('@/views/Redirect/Redirect.vue'),
+    name: 'Redirect',
+    meta: {
+      hidden: true,
+      noTagsView: true
+    }
+  },
+  {
     path: '/403',
     component: () => import('@/views/Error/403.vue'),
     name: 'NoAccess',

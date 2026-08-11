@@ -5,6 +5,21 @@
  */
 const managerRole = 'ROLE_BPM_MODEL_MANAGER'
 
+const componentNames: Record<string, string> = {
+  'bpm/processInstance/create/index': 'BpmProcessInstanceCreate',
+  'bpm/processInstance/index': 'BpmProcessInstanceMy',
+  'bpm/task/todo/index': 'BpmTodoTask',
+  'bpm/task/done/index': 'BpmDoneTask',
+  'bpm/task/copy/index': 'BpmProcessInstanceCopy',
+  'bpm/model/index': 'BpmModel',
+  'bpm/form/index': 'BpmForm',
+  'bpm/category/index': 'BpmCategory',
+  'bpm/processListener/index': 'BpmProcessListener',
+  'bpm/processExpression/index': 'BpmProcessExpression',
+  'bpm/processInstance/manager/index': 'BpmProcessInstanceManager',
+  'bpm/task/manager/index': 'BpmManagerTask'
+}
+
 const menu = (
   id: number,
   parentId: number,
@@ -20,7 +35,7 @@ const menu = (
   path,
   icon,
   component,
-  componentName: '',
+  componentName: componentNames[component] || '',
   redirect: '',
   visible: true,
   keepAlive: true,

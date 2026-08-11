@@ -4,6 +4,7 @@ import { cloneDeep } from 'lodash-es'
 import { flatMultiLevelRoutes, generateRoute } from '@/utils/routerHelper'
 import { CACHE_KEY, useCache } from '@/hooks/web/useCache'
 import { getHeadlessBpmMenus } from '@/router/modules/headlessBpm'
+import { appendHeadlessBpmHiddenRoutes } from '@/router/modules/headlessBpmHidden'
 
 const { wsCache } = useCache()
 
@@ -42,6 +43,7 @@ export const usePermissionStore = defineStore('permission', {
         const roles = (wsCache.get(CACHE_KEY.USER)?.roles || []) as string[]
         const res = getHeadlessBpmMenus(roles)
         const routerMap: AppRouteRecordRaw[] = generateRoute(res)
+        appendHeadlessBpmHiddenRoutes(routerMap)
         // 动态路由，404一定要放到最后面
         // preschooler：vue-router@4以后已支持静态404路由，此处可不再追加
         this.addRouters = routerMap.concat([

@@ -133,7 +133,7 @@ const openForm = (type: string, id?: number) => {
   } else {
     push({
       name: 'BpmModelUpdate',
-      params: { id }
+      params: { type: 'update', id }
     })
   }
 }
