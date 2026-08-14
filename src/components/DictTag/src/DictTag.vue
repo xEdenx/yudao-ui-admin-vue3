@@ -64,7 +64,9 @@ export default defineComponent({
           }}
         >
           {dictOptions.map((dict: DictDataType) => {
-            if (valueArr.value.includes(dict.value)) {
+            // Headless BPM returns enum values as numbers/booleans, whereas the rendered
+            // value is normalized to a string above. Compare the same representation.
+            if (valueArr.value.includes(String(dict.value))) {
               if (dict.colorType + '' === 'primary' || dict.colorType + '' === 'default') {
                 dict.colorType = ''
               }
