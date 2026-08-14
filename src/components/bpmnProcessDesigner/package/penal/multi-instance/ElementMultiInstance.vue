@@ -260,22 +260,49 @@ const changeConfig = (config) => {
 const approveMethod = ref()
 const approveRatio = ref(100)
 const otherExtensions = ref()
+const getApproveMethodFromLoopCharacteristics = (loopCharacteristics: any) => {
+  if (!loopCharacteristics) {
+    return ApproveMethodType.SEQUENTIAL_APPROVE
+  }
+  if (loopCharacteristics.isSequential) {
+    return ApproveMethodType.SEQUENTIAL_APPROVE
+  }
+
+  const completionCondition = String(loopCharacteristics.completionCondition?.body ?? '').replace(
+    /\s/g,
+    ''
+  )
+  if (completionCondition.includes('nrOfCompletedInstances>0')) {
+    return ApproveMethodType.ANY_APPROVE
+  }
+  const approveRatioMatch = completionCondition.match(
+    /nrOfCompletedInstances\/nrOfInstances>=([\d.]+)/
+  )
+  if (approveRatioMatch) {
+    approveRatio.value = Math.round(Number(approveRatioMatch[1]) * 100)
+  }
+  return ApproveMethodType.APPROVE_BY_RATIO
+}
 const getElementLoopNew = () => {
   if (props.type === 'UserTask' && bpmnElement.value) {
     const extensionElements =
       bpmnElement.value.businessObject?.extensionElements ??
       bpmnInstances().moddle.create('bpmn:ExtensionElements', { values: [] })
-    approveMethod.value = extensionElements.values.filter(
+    const approveMethodExtension = extensionElements.values.filter(
       (ex) => ex.$type === `${prefix}:ApproveMethod`
-    )?.[0]?.value
+    )?.[0]
 
     otherExtensions.value =
       extensionElements.values.filter((ex) => ex.$type !== `${prefix}:ApproveMethod`) ?? []
 
-    if (!approveMethod.value) {
-      approveMethod.value = ApproveMethodType.SEQUENTIAL_APPROVE
-      updateLoopCharacteristics()
-    }
+    // BPMN XML 的扩展元素值以文本为边界契约；先按字符串匹配，再使用前端的数值枚举回显。
+    const persistedMethod = String(approveMethodExtension?.value ?? '')
+    const matchingMethod = APPROVE_METHODS.find((item) => String(item.value) === persistedMethod)
+    approveMethod.value = matchingMethod
+      ? matchingMethod.value
+      : getApproveMethodFromLoopCharacteristics(
+          bpmnElement.value.businessObject.loopCharacteristics
+        )
   }
 }
 const onApproveMethodChange = () => {

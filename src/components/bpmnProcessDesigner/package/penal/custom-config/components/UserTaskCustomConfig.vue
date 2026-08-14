@@ -11,7 +11,7 @@
   <div>
     <el-divider content-position="left">审批类型</el-divider>
     <el-form-item prop="approveType">
-      <el-radio-group v-model="approveType.value">
+      <el-radio-group v-model="approveType.value" @change="updateElementExtensions">
         <el-radio
           v-for="(item, index) in APPROVE_TYPE"
           :key="index"
@@ -392,9 +392,6 @@ const resetCustomConfigList = () => {
         ex.$type !== `${prefix}:SignEnable` &&
         ex.$type !== `${prefix}:ReasonRequire`
     ) ?? []
-
-  // 更新元素扩展属性，避免后续报错
-  updateElementExtensions()
 }
 
 const updateAssignStartUserHandlerType = () => {
